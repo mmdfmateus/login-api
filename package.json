@@ -18,5 +18,9 @@
   "homepage": "https://github.com/mmdfmateus/login-api#readme",
   "devDependencies": {
     "jest": "^26.1.0"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^5.9.23"
   }
 }

@@ -4,7 +4,8 @@
   "description": "Login API with Node.js using Clean Architecture and TDD",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest --watchAll",
+    "test:staged": "jest"
   },
   "repository": {
     "type": "git",
@@ -17,7 +18,9 @@
   },
   "homepage": "https://github.com/mmdfmateus/login-api#readme",
   "devDependencies": {
-    "jest": "^26.1.0"
+    "husky": "^4.2.5",
+    "jest": "^26.1.0",
+    "lint-staged": "^10.2.11"
   },
   "dependencies": {
     "express": "^4.17.1",

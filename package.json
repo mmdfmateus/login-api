@@ -1,0 +1,19 @@
+{
+  "name": "login-api",
+  "version": "1.0.0",
+  "description": "Login API with Node.js using Clean Architecture and TDD",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mmdfmateus/login-api.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mmdfmateus/login-api/issues"
+  },
+  "homepage": "https://github.com/mmdfmateus/login-api#readme"
+}

@@ -1,6 +1,7 @@
 const LoginRouter = require('./login-router');
 const MissingParameterError = require('../helpers/missing-param-error');
 const UnauthorizedError = require('../helpers/unauthorized-error');
+const InternalServerError = require('../helpers/internal-server-error');
 
 const makeSut = () => {
     class AuthUseCaseSpy {
@@ -54,6 +55,7 @@ describe('Login Router', () => {
         const httpResponse = sut.route();
 
         expect(httpResponse.statusCode).toBe(500);
+        expect(httpResponse.body).toEqual(new InternalServerError());
     });
 
     test('Should return 500 if httpRequest has no body', () => {
@@ -61,9 +63,10 @@ describe('Login Router', () => {
         const httpResponse = sut.route({});
 
         expect(httpResponse.statusCode).toBe(500);
+        expect(httpResponse.body).toEqual(new InternalServerError());
     });
 
-    test('Should call AuthUseCase with corretct params', () => {
+    test('Should call AuthUseCase with correct params', () => {
         const { sut, authUseCaseSpy } = makeSut();
         const httpRequest = {
             body: {
@@ -121,6 +124,7 @@ describe('Login Router', () => {
         const httpResponse = sut.route(httpRequest);
 
         expect(httpResponse.statusCode).toBe(500);
+        expect(httpResponse.body).toEqual(new InternalServerError());
     });
 
     test('Should return 500 if AuthUseCase has no auth method', () => {
@@ -135,5 +139,28 @@ describe('Login Router', () => {
         const httpResponse = sut.route(httpRequest);
 
         expect(httpResponse.statusCode).toBe(500);
+        expect(httpResponse.body).toEqual(new InternalServerError());
+    });
+
+    test('Should return 500 if AuthUseCase throws an exception', () => {
+        class AuthUseCaseSpy {
+            auth () {
+                throw new Error();
+            };
+        };    
+        const authUseCaseSpy = new AuthUseCaseSpy();
+        const sut = new LoginRouter(authUseCaseSpy);
+
+        const httpRequest = {
+            body: {
+                email: 'any@mail.com',
+                password: 'any'
+            }
+        };
+
+        const httpResponse = sut.route(httpRequest);
+
+        expect(httpResponse.statusCode).toBe(500);
+        expect(httpResponse.body).toEqual(new InternalServerError());
     });
 });

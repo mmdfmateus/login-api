@@ -2,26 +2,45 @@ const LoginRouter = require('./login-router');
 const MissingParameterError = require('../helpers/missing-param-error');
 const UnauthorizedError = require('../helpers/unauthorized-error');
 const InternalServerError = require('../helpers/internal-server-error');
+const InvalidParameterError = require('../helpers/invalid-param-error');
 
 const makeSut = () => {
+    const authUseCaseSpy = makeAuthUseCase();
+    const emailValidatorSpy = makeEmailValidator()
+    const sut = new LoginRouter(authUseCaseSpy, emailValidatorSpy);
+    
+    return {
+        sut,
+        authUseCaseSpy,
+        emailValidatorSpy
+    }
+};
+
+const makeEmailValidator = () => {
+    class EmailValidatorSpy {
+        isValid(email) {
+            return this.isEmailValid;
+        };
+    }
+    const emailValidatorSpy = new EmailValidatorSpy();
+    emailValidatorSpy.isEmailValid = true;
+    return emailValidatorSpy;
+}
+
+const makeAuthUseCase = () => {
     class AuthUseCaseSpy {
         async auth (email, password) {
             this.email = email;
             this.password = password;
-
+            
             return this.accessToken;
         };
     };
-
+    
     const authUseCaseSpy = new AuthUseCaseSpy();
     authUseCaseSpy.accessToken = 'valid_token';
-    const sut = new LoginRouter(authUseCaseSpy);
-
-    return {
-        sut,
-        authUseCaseSpy
-    }
-};
+    return authUseCaseSpy;
+}
 
 describe('Login Router', () => {
     test('Should return 400 if no email is provided', async () => {
@@ -162,5 +181,21 @@ describe('Login Router', () => {
 
         expect(httpResponse.statusCode).toBe(500);
         expect(httpResponse.body).toEqual(new InternalServerError());
+    });
+
+    test('Should return 400 if an invalid email is provided', async () => {
+        const { sut, emailValidatorSpy } = makeSut();
+        emailValidatorSpy.isEmailValid = false;
+        const httpRequest = {
+            body: {
+                email: 'invalid_email@mail.com',
+                password: 'any'
+            }
+        };
+
+        const httpResponse = await sut.route(httpRequest);
+
+        expect(httpResponse.statusCode).toBe(400);
+        expect(httpResponse.body).toEqual(new InvalidParameterError('email'));
     });
 });

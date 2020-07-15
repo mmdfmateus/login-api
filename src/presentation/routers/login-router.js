@@ -35,6 +35,7 @@ module.exports = class LoginRouter {
             return HttpResponse.ok({ accessToken: accessToken });
         } 
         catch (error) {
+            console.error(error);
             return HttpResponse.internalServerError();
         }
     }

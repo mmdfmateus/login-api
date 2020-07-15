@@ -13,5 +13,5 @@ describe('AuthUseCase', () => {
         const promise = sut.auth();
 
         expect(promise).rejects.toThrow();
-    })
-})
+    });
+});

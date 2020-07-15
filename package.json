@@ -4,9 +4,10 @@
   "description": "Login API with Node.js using Clean Architecture and TDD",
   "main": "index.js",
   "scripts": {
-    "test": "jest --watch --silent",
-    "test:staged": "jest --passWithNoTests --findRelatedTests --silent",
-    "test:ci": "jest --coverage --silent --verbose"
+    "test": "jest --silent --noStackTrace --passWithNoTests",
+    "test:unit": "npm test -- --watch",
+    "test:staged": "npm test -- --findRelatedTests",
+    "test:ci": "npm test -- --coverage"
   },
   "repository": {
     "type": "git",

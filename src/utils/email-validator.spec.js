@@ -14,7 +14,7 @@ describe('EmailValidator', () => {
     test('Should return true if validator returns true', () => {
         const sut = makeSut();
         
-        const isValid = sut.isValid('any_mail@mail.com');
+        const isValid = sut.isValid('valid_mail@mail.com');
 
         expect(isValid).toBe(true);
     });
@@ -26,5 +26,13 @@ describe('EmailValidator', () => {
         const isValid = sut.isValid('invalid_mail@mail.com');
 
         expect(isValid).toBe(false);
+    });
+
+    test('Should call validator with correct email', () => {
+        const sut = makeSut();
+        
+        sut.isValid('any_mail@mail.com');
+
+        expect(validator.email).toBe('any_mail@mail.com');
     });
 })

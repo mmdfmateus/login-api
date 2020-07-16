@@ -4,9 +4,11 @@ const AuthUseCase = require('./auth-usecase');
 const makeSut = () => {
     const encrypterSpy = makeEncrypter();
     const loadUserByEmailRepositorySpy = makeLoadUserByEmailRepository();
+    const updateAccessTokenRepositorySpy = makeUpdateAccessTokenRepository();
     const tokenGeneratorSpy = makeTokenGenerator();
     const sut = new AuthUseCase({
         loadUserByEmailRepository: loadUserByEmailRepositorySpy, 
+        updateAccessTokenRepository: updateAccessTokenRepositorySpy,
         encrypter: encrypterSpy, 
         tokenGenerator: tokenGeneratorSpy
     });
@@ -14,6 +16,7 @@ const makeSut = () => {
     return {
         encrypterSpy,
         loadUserByEmailRepositorySpy,
+        updateAccessTokenRepositorySpy,
         tokenGeneratorSpy,
         sut
     }
@@ -69,6 +72,18 @@ const makeLoadUserByEmailRepositoryWithError = () => {
     
     const loadUserByEmailRepositorySpy = new LoadUserByEmailRepository();
     return loadUserByEmailRepositorySpy;
+}
+
+const makeUpdateAccessTokenRepository = () => {
+    class UpdateAccessTokenRepository {
+        async update(userId, accessToken){
+            this.userId = userId;
+            this.accessToken = accessToken;
+        }
+    }
+
+    const updateAccessTokenRepositorySpy = new UpdateAccessTokenRepository();
+    return updateAccessTokenRepositorySpy;
 }
 
 const makeTokenGenerator = () => {
@@ -160,6 +175,15 @@ describe('AuthUseCase', () => {
 
         expect(tokenGeneratorSpy.accessToken).toBe(accessToken);
         expect(tokenGeneratorSpy.accessToken).toBeTruthy();
+    });
+
+    test('Should call UpdateAccessTokenRepository with correct params', async () => {
+        const { sut, updateAccessTokenRepositorySpy, loadUserByEmailRepositorySpy, tokenGeneratorSpy } = makeSut();
+
+        await sut.auth('valid_mail@mail.com', 'valid_password');
+
+        expect(updateAccessTokenRepositorySpy.userId).toBe(loadUserByEmailRepositorySpy.user.id);
+        expect(updateAccessTokenRepositorySpy.accessToken).toBe(tokenGeneratorSpy.accessToken);
     });
 
     test('Should throw if invalid dependencies is provided', async () => {

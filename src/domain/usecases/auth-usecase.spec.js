@@ -131,4 +131,13 @@ describe('AuthUseCase', () => {
 
         expect(tokenGeneratorSpy.userId).toBe(loadUserByEmailRepositorySpy.user.id);
     });
+
+    test('Should return accessToken if valid credentials are provided', async () => {
+        const { sut, tokenGeneratorSpy } = makeSut();
+
+        const accessToken = await sut.auth('valid_mail@mail.com', 'valid_password');
+
+        expect(tokenGeneratorSpy.accessToken).toBe(accessToken);
+        expect(tokenGeneratorSpy.accessToken).toBeTruthy();
+    });
 });

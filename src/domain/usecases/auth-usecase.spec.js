@@ -33,6 +33,17 @@ const makeEncrypter = () => {
     return encrypterSpy;
 }
 
+const makeEncrypterWithError = () => {
+    class Encrypter {
+        async compare() {
+            throw new Error();
+        }
+    }
+
+    const encrypterSpy = new Encrypter();
+    return encrypterSpy;
+}
+
 const makeLoadUserByEmailRepository = () => {
     class LoadUserByEmailRepository {
         async load(email) {
@@ -49,6 +60,17 @@ const makeLoadUserByEmailRepository = () => {
     return loadUserByEmailRepositorySpy;
 }
 
+const makeLoadUserByEmailRepositoryWithError = () => {
+    class LoadUserByEmailRepository {
+        async load() {
+            throw new Error()
+        }
+    }
+    
+    const loadUserByEmailRepositorySpy = new LoadUserByEmailRepository();
+    return loadUserByEmailRepositorySpy;
+}
+
 const makeTokenGenerator = () => {
     class TokenGenerator {
         async generate(userId) {
@@ -59,6 +81,17 @@ const makeTokenGenerator = () => {
 
     const tokenGeneratorSpy = new TokenGenerator();
     tokenGeneratorSpy.accessToken = 'valid_token';
+    return tokenGeneratorSpy;
+}
+
+const makeTokenGeneratorWithError = () => {
+    class TokenGenerator {
+        async generate() {
+            throw new Error()
+        }
+    }
+
+    const tokenGeneratorSpy = new TokenGenerator();
     return tokenGeneratorSpy;
 }
 
@@ -158,6 +191,30 @@ describe('AuthUseCase', () => {
                 loadUserByEmailRepository: loadUserByEmailRepositorySpy,
                 encrypter: encrypterSpy,
                 tokenGenerator: invalid
+            })
+        );
+
+        for(const sut of suts){
+            const promise = sut.auth('any_mail@mail.com', 'password');
+            await expect(promise).rejects.toThrow();
+        }
+    });
+    
+    test('Should throw if dependencies throw', async () => {
+        const loadUserByEmailRepository = makeLoadUserByEmailRepository();
+        const encrypterSpy = makeEncrypter();
+        const suts = [].concat(
+            new AuthUseCase({ 
+                loadUserByEmailRepository: makeLoadUserByEmailRepositoryWithError()
+            }),
+            new AuthUseCase({
+                loadUserByEmailRepository: loadUserByEmailRepository,
+                encrypter: makeEncrypterWithError()
+            }),
+            new AuthUseCase({
+                loadUserByEmailRepository: loadUserByEmailRepository,
+                encrypter: encrypterSpy,
+                tokenGenerator: makeTokenGeneratorWithError()
             })
         );
 

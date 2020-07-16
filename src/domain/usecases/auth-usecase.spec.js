@@ -1,4 +1,4 @@
-const { MissingParameterError } = require("../../utils/errors");
+const { MissingParameterError, InvalidParameterError } = require("../../utils/errors");
 
 const makeSut = () => {
     class LoadUserByEmailRepository {
@@ -30,6 +30,14 @@ class AuthUseCase {
             throw new MissingParameterError('password');
         }
 
+        if(!this.loadUserByEmailRepository) {
+            throw new MissingParameterError('loadUserByEmailRepository');
+        }
+
+        if(!this.loadUserByEmailRepository.load) {
+            throw new InvalidParameterError('loadUserByEmailRepository');
+        }
+
         await this.loadUserByEmailRepository.load(email);
     }
 }
@@ -39,22 +47,37 @@ describe('AuthUseCase', () => {
         const { sut } = makeSut();
         const promise = sut.auth();
 
-        expect(promise).rejects.toThrow(new MissingParameterError('email'));
+        await expect(promise).rejects.toThrow(new MissingParameterError('email'));
     });
 
     test('Should throw if no password is provided', async () => {
         const { sut } = makeSut();
         const promise = sut.auth('any_mail@mail.com');
 
-        expect(promise).rejects.toThrow(new MissingParameterError('password'));
+        await expect(promise).rejects.toThrow(new MissingParameterError('password'));
     });
 
     test('Should call LoadUserByEmailRepository with correct email', async () => {
         const { sut, loadUserByEmailRepositorySpy } = makeSut();
 
-
         await sut.auth('any_mail@mail.com', 'password');
 
         expect(loadUserByEmailRepositorySpy.email).toBe('any_mail@mail.com');
+    });
+
+    test('Should throw if no LoadUserByEmailRepository is provided', async () => {
+        const sut = new AuthUseCase();
+
+        const promise = sut.auth('any_mail@mail.com', 'password');
+
+        await expect(promise).rejects.toThrow(new MissingParameterError('loadUserByEmailRepository'));
+    });
+
+    test('Should throw if LoadUserByEmailRepository has no load method', async () => {
+        const sut = new AuthUseCase({});
+
+        const promise = sut.auth('any_mail@mail.com', 'password');
+
+        await expect(promise).rejects.toThrow(new InvalidParameterError('loadUserByEmailRepository'));
     });
 });

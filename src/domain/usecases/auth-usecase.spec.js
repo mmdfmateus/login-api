@@ -4,11 +4,13 @@ const AuthUseCase = require('./auth-usecase');
 const makeSut = () => {
     const encrypterSpy = makeEncrypter();
     const loadUserByEmailRepositorySpy = makeLoadUserByEmailRepository();
-    const sut = new AuthUseCase(loadUserByEmailRepositorySpy, encrypterSpy);
+    const tokenGeneratorSpy = makeTokenGenerator();
+    const sut = new AuthUseCase(loadUserByEmailRepositorySpy, encrypterSpy, tokenGeneratorSpy);
 
     return {
         encrypterSpy,
         loadUserByEmailRepositorySpy,
+        tokenGeneratorSpy,
         sut
     }
 }
@@ -37,9 +39,23 @@ const makeLoadUserByEmailRepository = () => {
     
     const loadUserByEmailRepositorySpy = new LoadUserByEmailRepository();
     loadUserByEmailRepositorySpy.user = {
+        id: 'user_id',
         password: 'hashed_password'
     };
     return loadUserByEmailRepositorySpy;
+}
+
+const makeTokenGenerator = () => {
+    class TokenGenerator {
+        async generate(userId) {
+            this.userId = userId;
+            return this.accessToken;
+        }
+    }
+
+    const tokenGeneratorSpy = new TokenGenerator();
+    tokenGeneratorSpy.accessToken = 'valid_token';
+    return tokenGeneratorSpy;
 }
 
 describe('AuthUseCase', () => {
@@ -106,5 +122,13 @@ describe('AuthUseCase', () => {
 
         expect(encrypterSpy.password).toBe('any_password');
         expect(encrypterSpy.hashedPassword).toBe(loadUserByEmailRepositorySpy.user.password);
+    });
+
+    test('Should call TokenGenerator with correct param', async () => {
+        const { sut, loadUserByEmailRepositorySpy, tokenGeneratorSpy } = makeSut();
+
+        await sut.auth('valid_mail@mail.com', 'valid_password');
+
+        expect(tokenGeneratorSpy.userId).toBe(loadUserByEmailRepositorySpy.user.id);
     });
 });

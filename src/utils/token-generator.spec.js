@@ -1,21 +1,6 @@
 const jwt = require('jsonwebtoken');
-const { MissingParameterError } = require('./errors')
-
-class TokenGenerator {
-    constructor(secret){
-        this.secret = secret;
-    }
-
-    async generate(id){
-        if(!this.secret){
-            throw new MissingParameterError('secret');
-        }
-        if(!id){
-            throw new MissingParameterError('id');
-        }
-        return jwt.sign(id, this.secret);
-    }
-}
+const { MissingParameterError } = require('./errors');
+const TokenGenerator = require('./token-generator');
 
 const makeSut = () => {
 

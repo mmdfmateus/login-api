@@ -3,7 +3,7 @@ const { MissingParameterError, InvalidParameterError } = require('../../utils/er
 
 
 module.exports = class LoginRouter {
-    constructor (authUseCase, emailValidator) {
+    constructor ({ authUseCase, emailValidator } = {}) {
         this.authUseCase = authUseCase;
         this.emailValidator = emailValidator;
     }

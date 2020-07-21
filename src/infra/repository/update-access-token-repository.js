@@ -1,10 +1,7 @@
 const { MissingParameterError } = require('../../utils/errors');
+const MongoHelper = require('../helpers/mongo-helper');
 
 module.exports = class UpdateAccessTokenRepository{
-    constructor(userModel){
-        this.userModel = userModel;
-    }
-
     async update(userId, accessToken){
         if(!userId){
             throw new MissingParameterError('userId');
@@ -13,7 +10,8 @@ module.exports = class UpdateAccessTokenRepository{
             throw new MissingParameterError('accessToken');
         }
 
-        await this.userModel.updateOne({
+        const db = await MongoHelper.getDb();
+        await db.collection('users').updateOne({
             _id: userId
         }, {
             $set: {

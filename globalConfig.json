@@ -1,5 +1,1 @@
-<<<<<<< Updated upstream
-{"mongoUri":"mongodb://127.0.0.1:63003/bbdfaa84-7ecd-4eb7-b62d-3ae3c9b5b813?","mongoDBName":"jest"}
-=======
-{"mongoUri":"mongodb://127.0.0.1:62692/f221ffbe-4251-4bdd-8a37-51d8b8630d47?","mongoDBName":"jest"}
->>>>>>> Stashed changes
+{"mongoUri":"mongodb://127.0.0.1:63274/f17692f1-c05b-4d48-8059-3eb4f62a29b5?","mongoDBName":"jest"}

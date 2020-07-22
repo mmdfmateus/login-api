@@ -1,3 +1,15 @@
+jest.mock('bcrypt', () => ({
+    isValid: true,
+    value: '',
+    hashedValue: '',
+
+    async compare(value, hashedValue){
+        this.value = value;
+        this.hashedValue = hashedValue;
+        return this.isValid;
+    }
+}));
+
 const Encrypter = require('./encrypter');
 const { MissingParameterError } = require('../utils/errors')
 const bcrypt = require('bcrypt');

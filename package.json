@@ -24,7 +24,7 @@
   "devDependencies": {
     "@shelf/jest-mongodb": "^1.2.1",
     "husky": "^4.2.5",
-    "jest": "^26.1.0",
+    "jest": "^24.9.0",
     "lint-staged": "^10.2.11"
   },
   "dependencies": {
